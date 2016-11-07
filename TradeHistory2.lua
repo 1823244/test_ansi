@@ -1,30 +1,30 @@
---внешний вид можно скопировать из этой разработки
+п»ї--РІРЅРµС€РЅРёР№ РІРёРґ РјРѕР¶РЅРѕ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ РёР· СЌС‚РѕР№ СЂР°Р·СЂР°Р±РѕС‚РєРё
 --http://pmntrade.ru/trades_history.html
 
---пример из учебника по QLUA
+--РїСЂРёРјРµСЂ РёР· СѓС‡РµР±РЅРёРєР° РїРѕ QLUA
 dofile (getScriptPath() .. "\\quik_table_wrapper.lua")
 
 --[[
-читаем позиции из sqlite, выводим их цену и считаем PnL по текущей котировки.
-в пунктах и в рублях. чтобы посчитать рубли, нужно получить стоимость шага цены
+С‡РёС‚Р°РµРј РїРѕР·РёС†РёРё РёР· sqlite, РІС‹РІРѕРґРёРј РёС… С†РµРЅСѓ Рё СЃС‡РёС‚Р°РµРј PnL РїРѕ С‚РµРєСѓС‰РµР№ РєРѕС‚РёСЂРѕРІРєРё.
+РІ РїСѓРЅРєС‚Р°С… Рё РІ СЂСѓР±Р»СЏС…. С‡С‚РѕР±С‹ РїРѕСЃС‡РёС‚Р°С‚СЊ СЂСѓР±Р»Рё, РЅСѓР¶РЅРѕ РїРѕР»СѓС‡РёС‚СЊ СЃС‚РѕРёРјРѕСЃС‚СЊ С€Р°РіР° С†РµРЅС‹
 ]]
 
 local sqlite3 = require("lsqlite3")
 local db = sqlite3.open(getScriptPath() .. "\\positions.db")
 --local db = sqlite3.open_memory()
 
--- Константы --
+-- РљРѕРЅСЃС‚Р°РЅС‚С‹ --
 
--- Глобальные переменные --
+-- Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ --
 
---таблица истории
+--С‚Р°Р±Р»РёС†Р° РёСЃС‚РѕСЂРёРё
 local t 
---эта dll нужна для работы с битовыми флагами сделок. там зашито направление buy/sell
+--СЌС‚Р° dll РЅСѓР¶РЅР° РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ Р±РёС‚РѕРІС‹РјРё С„Р»Р°РіР°РјРё СЃРґРµР»РѕРє. С‚Р°Рј Р·Р°С€РёС‚Рѕ РЅР°РїСЂР°РІР»РµРЅРёРµ buy/sell
 local bit = require"bit"
 
---таблица, в которой будем хранить ИД сделок, которые уже обработаны в OnTrade()
---проблема в том, что OnTrade() вызывается более одного раза при создании сделки в терминале,
---поэтому надо проверять, что мы сделку уже обработали, чтобы не получить дубль в истории.
+--С‚Р°Р±Р»РёС†Р°, РІ РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµРј С…СЂР°РЅРёС‚СЊ РР” СЃРґРµР»РѕРє, РєРѕС‚РѕСЂС‹Рµ СѓР¶Рµ РѕР±СЂР°Р±РѕС‚Р°РЅС‹ РІ OnTrade()
+--РїСЂРѕР±Р»РµРјР° РІ С‚РѕРј, С‡С‚Рѕ OnTrade() РІС‹Р·С‹РІР°РµС‚СЃСЏ Р±РѕР»РµРµ РѕРґРЅРѕРіРѕ СЂР°Р·Р° РїСЂРё СЃРѕР·РґР°РЅРёРё СЃРґРµР»РєРё РІ С‚РµСЂРјРёРЅР°Р»Рµ,
+--РїРѕСЌС‚РѕРјСѓ РЅР°РґРѕ РїСЂРѕРІРµСЂСЏС‚СЊ, С‡С‚Рѕ РјС‹ СЃРґРµР»РєСѓ СѓР¶Рµ РѕР±СЂР°Р±РѕС‚Р°Р»Рё, С‡С‚РѕР±С‹ РЅРµ РїРѕР»СѓС‡РёС‚СЊ РґСѓР±Р»СЊ РІ РёСЃС‚РѕСЂРёРё.
 local currentDeals = {}
 
 is_run = true
@@ -32,9 +32,9 @@ is_run = true
 
 --SERVICE
 
---ищет сделку по номеру trade_num в таблице кэша сделок
---Параметры
---  num - номер сделки
+--РёС‰РµС‚ СЃРґРµР»РєСѓ РїРѕ РЅРѕРјРµСЂСѓ trade_num РІ С‚Р°Р±Р»РёС†Рµ РєСЌС€Р° СЃРґРµР»РѕРє
+--РџР°СЂР°РјРµС‚СЂС‹
+--  num - РЅРѕРјРµСЂ СЃРґРµР»РєРё
 function find_current_deal(num)
   for key, value in pairs(currentDeals) do
     --message(key)
@@ -46,20 +46,20 @@ function find_current_deal(num)
   return 0
 end
 
---возвращает дату сделки в строковом формате '6.11.2016'
+--РІРѕР·РІСЂР°С‰Р°РµС‚ РґР°С‚Сѓ СЃРґРµР»РєРё РІ СЃС‚СЂРѕРєРѕРІРѕРј С„РѕСЂРјР°С‚Рµ '6.11.2016'
 function get_trade_date(trade)
   local date = trade.datetime.day..'.'..trade.datetime.month..'.'..trade.datetime.year
   return date
 end
 
---возвращает дату сделки в строковом формате '10.26.13'
+--РІРѕР·РІСЂР°С‰Р°РµС‚ РґР°С‚Сѓ СЃРґРµР»РєРё РІ СЃС‚СЂРѕРєРѕРІРѕРј С„РѕСЂРјР°С‚Рµ '10.26.13'
 function get_trade_time(trade)
   local time = trade.datetime.hour..':'..trade.datetime.min..':'..trade.datetime.sec
   return time
 end
 
 
---пересчитывает прибыль
+--РїРµСЂРµСЃС‡РёС‚С‹РІР°РµС‚ РїСЂРёР±С‹Р»СЊ
 function recalcPosition(row)
 
   local priceOpen = tonumber(t:GetValue(row, 'priceOpen').image)
@@ -96,16 +96,16 @@ function recalcPosition(row)
   
   t:SetValue(row, 'profitpt', tostring(Total_PnL))
   
-  --чтобы получить проценты приходится применять извращенную конструкцию
-  --сначала умножить долю на 1 млн, затем разделить на 10 тыс, потому что
-  --функция ceil округляет до целого и если ее применить к доле, например 0.05 то получим НОЛЬ!
+  --С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёС‚СЊ РїСЂРѕС†РµРЅС‚С‹ РїСЂРёС…РѕРґРёС‚СЃСЏ РїСЂРёРјРµРЅСЏС‚СЊ РёР·РІСЂР°С‰РµРЅРЅСѓСЋ РєРѕРЅСЃС‚СЂСѓРєС†РёСЋ
+  --СЃРЅР°С‡Р°Р»Р° СѓРјРЅРѕР¶РёС‚СЊ РґРѕР»СЋ РЅР° 1 РјР»РЅ, Р·Р°С‚РµРј СЂР°Р·РґРµР»РёС‚СЊ РЅР° 10 С‚С‹СЃ, РїРѕС‚РѕРјСѓ С‡С‚Рѕ
+  --С„СѓРЅРєС†РёСЏ ceil РѕРєСЂСѓРіР»СЏРµС‚ РґРѕ С†РµР»РѕРіРѕ Рё РµСЃР»Рё РµРµ РїСЂРёРјРµРЅРёС‚СЊ Рє РґРѕР»Рµ, РЅР°РїСЂРёРјРµСЂ 0.05 С‚Рѕ РїРѕР»СѓС‡РёРј РќРћР›Р¬!
   
-  local PnL_percent = math.ceil ((PnL*1000000)/priceOpen)/10000   --округл вверх до целого
+  local PnL_percent = math.ceil ((PnL*1000000)/priceOpen)/10000   --РѕРєСЂСѓРіР» РІРІРµСЂС… РґРѕ С†РµР»РѕРіРѕ
   
   t:SetValue(row, 'profit %', tostring(PnL_percent))
-  --установим цвет строки в зависимости от прибыли или убытка
+  --СѓСЃС‚Р°РЅРѕРІРёРј С†РІРµС‚ СЃС‚СЂРѕРєРё РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РїСЂРёР±С‹Р»Рё РёР»Рё СѓР±С‹С‚РєР°
   
-  --это для светлой темы
+  --СЌС‚Рѕ РґР»СЏ СЃРІРµС‚Р»РѕР№ С‚РµРјС‹
   
   --RGB(NUMBER red, NUMBER green, NUMBER blue)
   --[[
@@ -123,16 +123,16 @@ function recalcPosition(row)
   end
   --]]
   
-  --это для ТЕМНОЙ темы
+  --СЌС‚Рѕ РґР»СЏ РўР•РњРќРћР™ С‚РµРјС‹
   ---[[
-  local b_color = RGB(27, 27, 27)         --цвет фона строки
-  local f_color = RGB(100, 100, 100)      --цвет шрифта строки
-  local sel_b_color = RGB(30, 30, 30)     --цвет фона выбранной строки
-  local sel_f_color = RGB(200, 200, 200)  --цвет шрифта выбранной строки
+  local b_color = RGB(27, 27, 27)         --С†РІРµС‚ С„РѕРЅР° СЃС‚СЂРѕРєРё
+  local f_color = RGB(100, 100, 100)      --С†РІРµС‚ С€СЂРёС„С‚Р° СЃС‚СЂРѕРєРё
+  local sel_b_color = RGB(30, 30, 30)     --С†РІРµС‚ С„РѕРЅР° РІС‹Р±СЂР°РЅРЅРѕР№ СЃС‚СЂРѕРєРё
+  local sel_f_color = RGB(200, 200, 200)  --С†РІРµС‚ С€СЂРёС„С‚Р° РІС‹Р±СЂР°РЅРЅРѕР№ СЃС‚СЂРѕРєРё
   if PnL > 0 then
     --b_color = RGB(30, 30, 30)  --green 
     f_color = RGB(110, 180, 110)
-    sel_f_color = RGB(110, 180, 110)  --цвет шрифта выбранной строки
+    sel_f_color = RGB(110, 180, 110)  --С†РІРµС‚ С€СЂРёС„С‚Р° РІС‹Р±СЂР°РЅРЅРѕР№ СЃС‚СЂРѕРєРё
     SetColor(t.t_id, row, QTABLE_NO_INDEX, b_color, f_color, sel_b_color, sel_f_color)
   else
     --b_color = RGB(20, 20, 20)  --red 
@@ -146,8 +146,8 @@ function recalcPosition(row)
   
 end
 
---функция возвращает true, если бит [index] установлен в 1 (взято из примеров some_callbacks.lua)
---пример вызова для определения направления
+--С„СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё Р±РёС‚ [index] СѓСЃС‚Р°РЅРѕРІР»РµРЅ РІ 1 (РІР·СЏС‚Рѕ РёР· РїСЂРёРјРµСЂРѕРІ some_callbacks.lua)
+--РїСЂРёРјРµСЂ РІС‹Р·РѕРІР° РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РЅР°РїСЂР°РІР»РµРЅРёСЏ
 --if bit_set(flags, 2) then
 --		t["sell"]=1
 --	else
@@ -164,16 +164,16 @@ function bit_set( flags, index )
   end
 end
 
--- возвращает первую строку секции открытых позиций (следующая за словом OPEN)
+-- РІРѕР·РІСЂР°С‰Р°РµС‚ РїРµСЂРІСѓСЋ СЃС‚СЂРѕРєСѓ СЃРµРєС†РёРё РѕС‚РєСЂС‹С‚С‹С… РїРѕР·РёС†РёР№ (СЃР»РµРґСѓСЋС‰Р°СЏ Р·Р° СЃР»РѕРІРѕРј OPEN)
 function findFirstOpenPosRow()
     
-    --определим количество строк в таблице робота  
+    --РѕРїСЂРµРґРµР»РёРј РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє РІ С‚Р°Р±Р»РёС†Рµ СЂРѕР±РѕС‚Р°  
     local rows = t:GetSize(t.t_id)
   
-    --обход таблицы истории сделок
+    --РѕР±С…РѕРґ С‚Р°Р±Р»РёС†С‹ РёСЃС‚РѕСЂРёРё СЃРґРµР»РѕРє
     for row=1, rows, 1 do
       
-      --ищем, где начинаются открытые позиции
+      --РёС‰РµРј, РіРґРµ РЅР°С‡РёРЅР°СЋС‚СЃСЏ РѕС‚РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё
       if t:GetValue(row,'dateOpen').image == 'OPEN' then
         return (row + 1)
       end
@@ -182,16 +182,16 @@ function findFirstOpenPosRow()
     return 99999999
 end
 
--- возвращает первую строку секции закрытых позиций (следующая за словом CLOSED)
+-- РІРѕР·РІСЂР°С‰Р°РµС‚ РїРµСЂРІСѓСЋ СЃС‚СЂРѕРєСѓ СЃРµРєС†РёРё Р·Р°РєСЂС‹С‚С‹С… РїРѕР·РёС†РёР№ (СЃР»РµРґСѓСЋС‰Р°СЏ Р·Р° СЃР»РѕРІРѕРј CLOSED)
 function findFirstClosedPosRow()
     
-    --определим количество строк в таблице робота  
+    --РѕРїСЂРµРґРµР»РёРј РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє РІ С‚Р°Р±Р»РёС†Рµ СЂРѕР±РѕС‚Р°  
     local rows = t:GetSize(t.t_id)
   
-    --обход таблицы истории сделок
+    --РѕР±С…РѕРґ С‚Р°Р±Р»РёС†С‹ РёСЃС‚РѕСЂРёРё СЃРґРµР»РѕРє
     for row=1, rows, 1 do
       
-      --ищем, где начинаются открытые позиции
+      --РёС‰РµРј, РіРґРµ РЅР°С‡РёРЅР°СЋС‚СЃСЏ РѕС‚РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё
       if t:GetValue(row,'dateOpen').image == 'CLOSED' then
         return (row + 1)
       end
@@ -204,7 +204,7 @@ end
 
 
 
---загружает закрытые позиции
+--Р·Р°РіСЂСѓР¶Р°РµС‚ Р·Р°РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё
 function loadClosedPositions()
 
 	loadClosedFifoPositions(0)
@@ -212,7 +212,7 @@ function loadClosedPositions()
 	
 end
 
---загружает в таблицу открытые позиции. данные из sqlite
+--Р·Р°РіСЂСѓР¶Р°РµС‚ РІ С‚Р°Р±Р»РёС†Сѓ РѕС‚РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё. РґР°РЅРЅС‹Рµ РёР· sqlite
 function loadOpenPositions()
 
   loadOpenFifoPositions(0)--long
@@ -220,23 +220,23 @@ function loadOpenPositions()
   
 end
 
---загружает позиции из sqlite
+--Р·Р°РіСЂСѓР¶Р°РµС‚ РїРѕР·РёС†РёРё РёР· sqlite
 function loadPositions()
 
-  --закрытые позиции
+  --Р·Р°РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё
   
   local row = t:AddLine()
-  --заголовок закрытых позиций
+  --Р·Р°РіРѕР»РѕРІРѕРє Р·Р°РєСЂС‹С‚С‹С… РїРѕР·РёС†РёР№
   
   t:SetValue(row, 'dateOpen', "CLOSED")
   t:SetValue(row, 'timeOpen', "POSITIONS")
 
   loadClosedPositions()
   
-  --открытые позиции
+  --РѕС‚РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё
   
   local row = t:AddLine()
-  --заголовок открытых позиций
+  --Р·Р°РіРѕР»РѕРІРѕРє РѕС‚РєСЂС‹С‚С‹С… РїРѕР·РёС†РёР№
   
   t:SetValue(row, 'dateOpen', "OPEN")
   t:SetValue(row, 'timeOpen', "POSITIONS")
@@ -245,7 +245,7 @@ function loadPositions()
   
 end
 
---очищает таблицу робота 
+--РѕС‡РёС‰Р°РµС‚ С‚Р°Р±Р»РёС†Сѓ СЂРѕР±РѕС‚Р° 
 function clearTable()
   
   local rows = t:GetSize(t.t_id)
@@ -257,7 +257,7 @@ function clearTable()
   
 end
 
---удаляет из таблицы робота открытые позиции. т.е. строки, ниже заголовка OPEN POSITIONS
+--СѓРґР°Р»СЏРµС‚ РёР· С‚Р°Р±Р»РёС†С‹ СЂРѕР±РѕС‚Р° РѕС‚РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё. С‚.Рµ. СЃС‚СЂРѕРєРё, РЅРёР¶Рµ Р·Р°РіРѕР»РѕРІРєР° OPEN POSITIONS
 function clearOpenPositions()
   
   local fr = findFirstOpenPosRow()
@@ -271,7 +271,7 @@ function clearOpenPositions()
   
 end
 
---удаляет из таблицы робота закрытые позиции. т.е. строки, ниже заголовка CLOSED POSITIONS и выше OPEN POSITIONS
+--СѓРґР°Р»СЏРµС‚ РёР· С‚Р°Р±Р»РёС†С‹ СЂРѕР±РѕС‚Р° Р·Р°РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё. С‚.Рµ. СЃС‚СЂРѕРєРё, РЅРёР¶Рµ Р·Р°РіРѕР»РѕРІРєР° CLOSED POSITIONS Рё РІС‹С€Рµ OPEN POSITIONS
 function clearClosedPositions()
   
   local f_c_r = findFirstClosedPosRow()
@@ -288,21 +288,21 @@ end
 
 --FIFO
 
---получает таблицу остатков партий фифо, сортировка по номеру сделки
---Параметры
+--РїРѕР»СѓС‡Р°РµС‚ С‚Р°Р±Р»РёС†Сѓ РѕСЃС‚Р°С‚РєРѕРІ РїР°СЂС‚РёР№ С„РёС„Рѕ, СЃРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РЅРѕРјРµСЂСѓ СЃРґРµР»РєРё
+--РџР°СЂР°РјРµС‚СЂС‹
 --  isShort - in - integer - 0/1 long/short
 function getRestsFIFO(client_code, sec_code, comment, isShort)
 
   sql=[[SELECT 
           
-         --измерения
+         --РёР·РјРµСЂРµРЅРёСЏ
           dim_client_code,
           dim_sec_code,  
           dim_class_code,  
           dim_trade_num, 
           dim_brokerref,
           
-          --ресурсы
+          --СЂРµСЃСѓСЂСЃС‹
           SUM(res_qty) AS qty,  
           SUM(res_value) AS value
           
@@ -334,7 +334,7 @@ function getRestsFIFO(client_code, sec_code, comment, isShort)
     sql = string.gsub (sql, '&client_code', client_code)
     sql = string.gsub (sql, '&comment', comment)
   
-    --замена регистра
+    --Р·Р°РјРµРЅР° СЂРµРіРёСЃС‚СЂР°
     if isShort == 1 then
       sql = string.gsub (sql, 'fifo_long', 'fifo_short')
     end
@@ -355,7 +355,7 @@ function getRestsFIFO(client_code, sec_code, comment, isShort)
       rests[r_count]['dim_trade_num']   =row.dim_trade_num 
       rests[r_count]['dim_brokerref']   =row.dim_brokerref
       
-          --ресурсы
+          --СЂРµСЃСѓСЂСЃС‹
       rests[r_count]['qty']         =row.qty  
       rests[r_count]['value']       =row.value
       
@@ -365,10 +365,10 @@ function getRestsFIFO(client_code, sec_code, comment, isShort)
    return rests  
 end
 
---проводит сделку по ФИФО
+--РїСЂРѕРІРѕРґРёС‚ СЃРґРµР»РєСѓ РїРѕ Р¤РР¤Рћ
 function makeFifo(trade)
 
-    --определим направление сделки
+    --РѕРїСЂРµРґРµР»РёРј РЅР°РїСЂР°РІР»РµРЅРёРµ СЃРґРµР»РєРё
     local dir = ''
     if bit_set(trade.flags, 2) then
       dir = 'sell'
@@ -381,34 +381,34 @@ function makeFifo(trade)
       --buy. decrease short
       local restShort = getRestsFIFO(trade.client_code, trade.sec_code, trade.brokerref, 1)
       
-      --количество из сделки, на которое можно закрыть шорты
+      --РєРѕР»РёС‡РµСЃС‚РІРѕ РёР· СЃРґРµР»РєРё, РЅР° РєРѕС‚РѕСЂРѕРµ РјРѕР¶РЅРѕ Р·Р°РєСЂС‹С‚СЊ С€РѕСЂС‚С‹
       local total_qty_to_decrease = trade.qty
       
       
-      --счетчик цикла по остаткам из регистра
+      --СЃС‡РµС‚С‡РёРє С†РёРєР»Р° РїРѕ РѕСЃС‚Р°С‚РєР°Рј РёР· СЂРµРіРёСЃС‚СЂР°
       local rest_count = 1
       while rest_count <= table.maxn(restShort) and total_qty_to_decrease > 0 do
         
-        --списываем количество, только если оно не нулевое
+        --СЃРїРёСЃС‹РІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ, С‚РѕР»СЊРєРѕ РµСЃР»Рё РѕРЅРѕ РЅРµ РЅСѓР»РµРІРѕРµ
         if restShort[rest_count]['qty'] ~= 0 then
         
-          --коэффициент списания для партии    
+          --РєРѕСЌС„С„РёС†РёРµРЅС‚ СЃРїРёСЃР°РЅРёСЏ РґР»СЏ РїР°СЂС‚РёРё    
           local factor = 1
         
-          --остатки в шортах отрицательные, поэтому умножаем на -1
+          --РѕСЃС‚Р°С‚РєРё РІ С€РѕСЂС‚Р°С… РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рµ, РїРѕСЌС‚РѕРјСѓ СѓРјРЅРѕР¶Р°РµРј РЅР° -1
           if -1*restShort[rest_count]['qty'] >= total_qty_to_decrease then 
-            -- остаток партии больше, чем нам надо списать
+            -- РѕСЃС‚Р°С‚РѕРє РїР°СЂС‚РёРё Р±РѕР»СЊС€Рµ, С‡РµРј РЅР°Рј РЅР°РґРѕ СЃРїРёСЃР°С‚СЊ
             factor = total_qty_to_decrease / -1*restShort[rest_count]['qty']
           else
             factor = 1
           end
           
-          --гасим позиции
+          --РіР°СЃРёРј РїРѕР·РёС†РёРё
           
           local qty_decreased = -1*restShort[rest_count]['qty'] * factor
           local value_decreased = -1*restShort[rest_count]['value'] * factor
           
-          --пишем приход в регистр шортов
+          --РїРёС€РµРј РїСЂРёС…РѕРґ РІ СЂРµРіРёСЃС‚СЂ С€РѕСЂС‚РѕРІ
           
           local k="'"
           local sql='INSERT INTO fifo_short '..
@@ -417,18 +417,18 @@ function makeFifo(trade)
           'close_trade_num, close_date, close_time, close_price, close_qty, close_value, close_price_step, close_price_step_price'..
           ')'..
           ' VALUES('.. 
-                  --измерения
+                  --РёР·РјРµСЂРµРЅРёСЏ
                   k..restShort[rest_count]['dim_client_code']      ..k..','..
                   k..restShort[rest_count]['dim_sec_code']         ..k..','..  
                   k..restShort[rest_count]['dim_class_code']       ..k..','..  
                   restShort[rest_count]['dim_trade_num']           ..','..
                   k..restShort[rest_count]['dim_brokerref']        ..k..' ,'..
   
-                  --ресурсы
+                  --СЂРµСЃСѓСЂСЃС‹
                   qty_decreased                ..','..  
                   value_decreased              ..','..
   
-                  --реквизиты - только сделка, которая закрывает
+                  --СЂРµРєРІРёР·РёС‚С‹ - С‚РѕР»СЊРєРѕ СЃРґРµР»РєР°, РєРѕС‚РѕСЂР°СЏ Р·Р°РєСЂС‹РІР°РµС‚
                   
                   --'close_trade_num, close_date, close_time, close_price, close_qty, close_value, close_price_step, close_price_step_price
                   
@@ -445,7 +445,7 @@ function makeFifo(trade)
           --message(sql)                     
            db:exec(sql)          
           
-          -- подумать, нужно ли здесь еще измерения "Выручка, пропорционально списанной партии"        
+          -- РїРѕРґСѓРјР°С‚СЊ, РЅСѓР¶РЅРѕ Р»Рё Р·РґРµСЃСЊ РµС‰Рµ РёР·РјРµСЂРµРЅРёСЏ "Р’С‹СЂСѓС‡РєР°, РїСЂРѕРїРѕСЂС†РёРѕРЅР°Р»СЊРЅРѕ СЃРїРёСЃР°РЅРЅРѕР№ РїР°СЂС‚РёРё"        
           
           total_qty_to_decrease  = total_qty_to_decrease - qty_decreased      
         end
@@ -461,7 +461,7 @@ function makeFifo(trade)
         local k="'"
   
          local sql='INSERT INTO fifo_long '..
-          --перечислим поля, которые будем добавлять
+          --РїРµСЂРµС‡РёСЃР»РёРј РїРѕР»СЏ, РєРѕС‚РѕСЂС‹Рµ Р±СѓРґРµРј РґРѕР±Р°РІР»СЏС‚СЊ
           '(dim_client_code, dim_sec_code, dim_class_code, dim_trade_num,dim_brokerref,'..
           'res_qty, res_value,'..
           'attr_date, attr_time, attr_price, attr_trade_currency, attr_accruedint, attr_trans_id,'..
@@ -469,27 +469,27 @@ function makeFifo(trade)
   
           ' VALUES('..
            
-          --измерения
-          k..trade.client_code      ..k..','..--  Код клиента
-          k..trade.sec_code         ..k..','..--  Код бумаги заявки  
-          k..trade.class_code       ..k..','..--  Код класса  
-          trade.trade_num           ..','.. --  Номер сделки в торговой системе 
-          k..trade.brokerref        ..k..' ,'..--  Комментарий,'.. обычно: <код клиента>/<номер поручения>
+          --РёР·РјРµСЂРµРЅРёСЏ
+          k..trade.client_code      ..k..','..--  РљРѕРґ РєР»РёРµРЅС‚Р°
+          k..trade.sec_code         ..k..','..--  РљРѕРґ Р±СѓРјР°РіРё Р·Р°СЏРІРєРё  
+          k..trade.class_code       ..k..','..--  РљРѕРґ РєР»Р°СЃСЃР°  
+          trade.trade_num           ..','.. --  РќРѕРјРµСЂ СЃРґРµР»РєРё РІ С‚РѕСЂРіРѕРІРѕР№ СЃРёСЃС‚РµРјРµ 
+          k..trade.brokerref        ..k..' ,'..--  РљРѕРјРјРµРЅС‚Р°СЂРёР№,'.. РѕР±С‹С‡РЅРѕ: <РєРѕРґ РєР»РёРµРЅС‚Р°>/<РЅРѕРјРµСЂ РїРѕСЂСѓС‡РµРЅРёСЏ>
           
-          --ресурсы
+          --СЂРµСЃСѓСЂСЃС‹
           total_qty_to_decrease     ..','..  
           total_qty_to_decrease * trade.price  ..','..
           
-          --реквизиты  
-          k..get_trade_date(trade)..k..','..--  Дата и время
-          k..get_trade_time(trade)..k..','..--  Дата и время
-          trade.price               ..','.. --  Цена
-          k..trade.trade_currency..k..','..--  Валюта
-          trade.accruedint          ..','..--  Накопленный купонный доход
-          k..trade.trans_id..k      ..','..--  Идентификатор транзакции
-          trade.order_num           ..','..--  Номер заявки в торговой системе  
+          --СЂРµРєРІРёР·РёС‚С‹  
+          k..get_trade_date(trade)..k..','..--  Р”Р°С‚Р° Рё РІСЂРµРјСЏ
+          k..get_trade_time(trade)..k..','..--  Р”Р°С‚Р° Рё РІСЂРµРјСЏ
+          trade.price               ..','.. --  Р¦РµРЅР°
+          k..trade.trade_currency..k..','..--  Р’Р°Р»СЋС‚Р°
+          trade.accruedint          ..','..--  РќР°РєРѕРїР»РµРЅРЅС‹Р№ РєСѓРїРѕРЅРЅС‹Р№ РґРѕС…РѕРґ
+          k..trade.trans_id..k      ..','..--  РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚СЂР°РЅР·Р°РєС†РёРё
+          trade.order_num           ..','..--  РќРѕРјРµСЂ Р·Р°СЏРІРєРё РІ С‚РѕСЂРіРѕРІРѕР№ СЃРёСЃС‚РµРјРµ  
           getParamEx (trade.class_code, trade.sec_code, 'LOTSIZE').param_value  ..','..  
-          trade.exchange_comission  ..--  Комиссия Фондовой биржи (ММВБ)  
+          trade.exchange_comission  ..--  РљРѕРјРёСЃСЃРёСЏ Р¤РѕРЅРґРѕРІРѕР№ Р±РёСЂР¶Рё (РњРњР’Р‘)  
           ');'          
                      
         db:exec(sql)  
@@ -500,35 +500,35 @@ function makeFifo(trade)
     
       --sell. decrease long
       
-      --таблица остатков длинных позиций
+      --С‚Р°Р±Р»РёС†Р° РѕСЃС‚Р°С‚РєРѕРІ РґР»РёРЅРЅС‹С… РїРѕР·РёС†РёР№
       local restLong = getRestsFIFO(trade.client_code, trade.sec_code, trade.brokerref, 0)
       
-      --количество из сделки, на которое можно закрыть лонги
+      --РєРѕР»РёС‡РµСЃС‚РІРѕ РёР· СЃРґРµР»РєРё, РЅР° РєРѕС‚РѕСЂРѕРµ РјРѕР¶РЅРѕ Р·Р°РєСЂС‹С‚СЊ Р»РѕРЅРіРё
       local total_qty_to_decrease = trade.qty
       
-      --счетчик цикла по остаткам из регистра
+      --СЃС‡РµС‚С‡РёРє С†РёРєР»Р° РїРѕ РѕСЃС‚Р°С‚РєР°Рј РёР· СЂРµРіРёСЃС‚СЂР°
       local rest_count = 1
       while rest_count <= table.maxn(restLong) and total_qty_to_decrease > 0 do
         
-        --списываем количество, только если оно не нулевое
+        --СЃРїРёСЃС‹РІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ, С‚РѕР»СЊРєРѕ РµСЃР»Рё РѕРЅРѕ РЅРµ РЅСѓР»РµРІРѕРµ
         if restLong[rest_count]['qty'] ~= 0 then
         
-          --коэффициент списания для партии    
+          --РєРѕСЌС„С„РёС†РёРµРЅС‚ СЃРїРёСЃР°РЅРёСЏ РґР»СЏ РїР°СЂС‚РёРё    
           local factor = 1
         
           if restLong[rest_count]['qty'] >= total_qty_to_decrease then 
-            -- остаток партии больше, чем нам надо списать
+            -- РѕСЃС‚Р°С‚РѕРє РїР°СЂС‚РёРё Р±РѕР»СЊС€Рµ, С‡РµРј РЅР°Рј РЅР°РґРѕ СЃРїРёСЃР°С‚СЊ
             factor = total_qty_to_decrease / restLong[rest_count]['qty']
           else
             factor = 1
           end
           
-          --гасим лонги
+          --РіР°СЃРёРј Р»РѕРЅРіРё
           
           local qty_decreased = restLong[rest_count]['qty'] * factor
           local value_decreased = restLong[rest_count]['value'] * factor
           --message(restLong[rest_count]['dim_brokerref'])
-          --пишем расход в регистр лонгов
+          --РїРёС€РµРј СЂР°СЃС…РѕРґ РІ СЂРµРіРёСЃС‚СЂ Р»РѕРЅРіРѕРІ
           --message(restLong[rest_count]['dim_brokerref'])
           local k="'"
           local sql='INSERT INTO fifo_long '..
@@ -537,18 +537,18 @@ function makeFifo(trade)
           'close_trade_num, close_date, close_time, close_price, close_qty, close_value, close_price_step, close_price_step_price'..
           ')'..
           ' VALUES('.. 
-                  --измерения
+                  --РёР·РјРµСЂРµРЅРёСЏ
                   k..restLong[rest_count]['dim_client_code']      ..k..','..
                   k..restLong[rest_count]['dim_sec_code']         ..k..','..  
                   k..restLong[rest_count]['dim_class_code']       ..k..','..  
                   restLong[rest_count]['dim_trade_num']           ..','..
                   k..restLong[rest_count]['dim_brokerref']        ..k..','..
   
-                  --ресурсы
+                  --СЂРµСЃСѓСЂСЃС‹
                   -1*qty_decreased                ..','..  
                   -1*value_decreased              ..','..
   
-                  --реквизиты - только сделка, которая закрывает
+                  --СЂРµРєРІРёР·РёС‚С‹ - С‚РѕР»СЊРєРѕ СЃРґРµР»РєР°, РєРѕС‚РѕСЂР°СЏ Р·Р°РєСЂС‹РІР°РµС‚
                   
                   --'close_trade_num, close_date, close_time, close_price, close_qty, close_value, close_price_step, close_price_step_price
                   
@@ -564,7 +564,7 @@ function makeFifo(trade)
                   ');'          
           --message(sql)                     
            db:exec(sql)            
-          -- подумать, нужно ли здесь еще измерения "Выручка, пропорционально списанной партии"        
+          -- РїРѕРґСѓРјР°С‚СЊ, РЅСѓР¶РЅРѕ Р»Рё Р·РґРµСЃСЊ РµС‰Рµ РёР·РјРµСЂРµРЅРёСЏ "Р’С‹СЂСѓС‡РєР°, РїСЂРѕРїРѕСЂС†РёРѕРЅР°Р»СЊРЅРѕ СЃРїРёСЃР°РЅРЅРѕР№ РїР°СЂС‚РёРё"        
           
           total_qty_to_decrease  = total_qty_to_decrease - qty_decreased      
         end
@@ -575,14 +575,14 @@ function makeFifo(trade)
       
       --sell. increase short
       
-      --если в сделке еще осталось количество, открываем шорт
+      --РµСЃР»Рё РІ СЃРґРµР»РєРµ РµС‰Рµ РѕСЃС‚Р°Р»РѕСЃСЊ РєРѕР»РёС‡РµСЃС‚РІРѕ, РѕС‚РєСЂС‹РІР°РµРј С€РѕСЂС‚
     
       if total_qty_to_decrease > 0 then
 
         local k="'"
         
         local sql='INSERT INTO fifo_short '..
-          --перечислим поля, которые будем добавлять
+          --РїРµСЂРµС‡РёСЃР»РёРј РїРѕР»СЏ, РєРѕС‚РѕСЂС‹Рµ Р±СѓРґРµРј РґРѕР±Р°РІР»СЏС‚СЊ
               '(dim_client_code, dim_sec_code, dim_class_code, dim_trade_num, dim_brokerref,'..
                 'res_qty, res_value,'..
                 'attr_date,attr_time, attr_price,attr_trade_currency,attr_accruedint,attr_trans_id,'..
@@ -590,27 +590,27 @@ function makeFifo(trade)
         
                 ' VALUES('..
                  
-                --измерения
-                k..trade.client_code      ..k..','..--  Код клиента
-                k..trade.sec_code         ..k..','..--  Код бумаги заявки  
-                k..trade.class_code       ..k..','..--  Код класса  
-                trade.trade_num           ..','.. --  Номер сделки в торговой системе 
-                k..trade.brokerref        ..k..' ,'..--  Комментарий,'.. обычно: <код клиента>/<номер поручения>
+                --РёР·РјРµСЂРµРЅРёСЏ
+                k..trade.client_code      ..k..','..--  РљРѕРґ РєР»РёРµРЅС‚Р°
+                k..trade.sec_code         ..k..','..--  РљРѕРґ Р±СѓРјР°РіРё Р·Р°СЏРІРєРё  
+                k..trade.class_code       ..k..','..--  РљРѕРґ РєР»Р°СЃСЃР°  
+                trade.trade_num           ..','.. --  РќРѕРјРµСЂ СЃРґРµР»РєРё РІ С‚РѕСЂРіРѕРІРѕР№ СЃРёСЃС‚РµРјРµ 
+                k..trade.brokerref        ..k..' ,'..--  РљРѕРјРјРµРЅС‚Р°СЂРёР№,'.. РѕР±С‹С‡РЅРѕ: <РєРѕРґ РєР»РёРµРЅС‚Р°>/<РЅРѕРјРµСЂ РїРѕСЂСѓС‡РµРЅРёСЏ>
                 
-                --ресурсы
-                -1*total_qty_to_decrease                 ..','..--  Количество бумаг в последней сделке в лотах  
+                --СЂРµСЃСѓСЂСЃС‹
+                -1*total_qty_to_decrease                 ..','..--  РљРѕР»РёС‡РµСЃС‚РІРѕ Р±СѓРјР°Рі РІ РїРѕСЃР»РµРґРЅРµР№ СЃРґРµР»РєРµ РІ Р»РѕС‚Р°С…  
                 -1*total_qty_to_decrease * trade.price   ..','..
                 
-                --реквизиты  
-                k..get_trade_date(trade)..k..','..--  Дата и время
-                k..get_trade_time(trade)..k..','..--  Дата и время
-                trade.price               ..','.. --  Цена
-                k..trade.trade_currency..k..','..--  Валюта
-                trade.accruedint          ..','..--  Накопленный купонный доход
-                k..trade.trans_id..k      ..','..--  Идентификатор транзакции
-                trade.order_num           ..','..--  Номер заявки в торговой системе  
+                --СЂРµРєРІРёР·РёС‚С‹  
+                k..get_trade_date(trade)..k..','..--  Р”Р°С‚Р° Рё РІСЂРµРјСЏ
+                k..get_trade_time(trade)..k..','..--  Р”Р°С‚Р° Рё РІСЂРµРјСЏ
+                trade.price               ..','.. --  Р¦РµРЅР°
+                k..trade.trade_currency..k..','..--  Р’Р°Р»СЋС‚Р°
+                trade.accruedint          ..','..--  РќР°РєРѕРїР»РµРЅРЅС‹Р№ РєСѓРїРѕРЅРЅС‹Р№ РґРѕС…РѕРґ
+                k..trade.trans_id..k      ..','..--  РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚СЂР°РЅР·Р°РєС†РёРё
+                trade.order_num           ..','..--  РќРѕРјРµСЂ Р·Р°СЏРІРєРё РІ С‚РѕСЂРіРѕРІРѕР№ СЃРёСЃС‚РµРјРµ  
                 getParamEx (trade.class_code, trade.sec_code, 'LOTSIZE').param_value                       ..','..  
-                trade.exchange_comission  ..--  Комиссия Фондовой биржи (ММВБ)  
+                trade.exchange_comission  ..--  РљРѕРјРёСЃСЃРёСЏ Р¤РѕРЅРґРѕРІРѕР№ Р±РёСЂР¶Рё (РњРњР’Р‘)  
                 ');'          
                            
          db:exec(sql)  
@@ -621,7 +621,7 @@ function makeFifo(trade)
     
 end
 
---  ОТОБРАЖЕНИЕ ДАННЫХ ИЗ ФИФО В ТАБЛИЦУ РОБОТА
+--  РћРўРћР‘Р РђР–Р•РќРР• Р”РђРќРќР«РҐ РР— Р¤РР¤Рћ Р’ РўРђР‘Р›РР¦РЈ Р РћР‘РћРўРђ
 
 function addRowFromFIFO(sqliteRow, isShort)
 
@@ -665,13 +665,13 @@ function loadOpenFifoPositions(isShort)
 
   local sql=[[SELECT 
           
-         --измерения
+         --РёР·РјРµСЂРµРЅРёСЏ
           dim_client_code,
           dim_sec_code,  
           dim_class_code,  
           dim_brokerref,
           
-          --ресурсы
+          --СЂРµСЃСѓСЂСЃС‹
           SUM(res_qty) AS qty,  
           SUM(res_value) AS value,
           SUM(res_value)/SUM(res_qty) AS price
@@ -696,7 +696,7 @@ function loadOpenFifoPositions(isShort)
           dim_brokerref       
         ]]
   
-    --замена регистра
+    --Р·Р°РјРµРЅР° СЂРµРіРёСЃС‚СЂР°
     if isShort == 1 then
       sql = string.gsub (sql, 'fifo_long', 'fifo_short')
     end
@@ -755,18 +755,18 @@ function loadClosedFifoPositions(isShort)
 
   local sql=[[SELECT 
           
-         --измерения
+         --РёР·РјРµСЂРµРЅРёСЏ
           dim_client_code,
           dim_sec_code,  
           dim_class_code,  
           dim_brokerref,
           dim_trade_num,
           
-          --ресурсы
+          --СЂРµСЃСѓСЂСЃС‹
           res_qty AS qty,  
           res_value AS value,
           
-          --реквизиты
+          --СЂРµРєРІРёР·РёС‚С‹
           res_value/res_qty as price,
           attr_date as dateOpen,
           attr_time as timeOpen,
@@ -795,7 +795,7 @@ function loadClosedFifoPositions(isShort)
                  
         ]]
   
-    --замена регистра
+    --Р·Р°РјРµРЅР° СЂРµРіРёСЃС‚СЂР°
     if isShort == 1 then
       sql = string.gsub (sql, 'fifo_long', 'fifo_short')
       sql = string.gsub (sql, 'res_qty < 0', 'res_qty > 0')
@@ -810,19 +810,19 @@ function loadClosedFifoPositions(isShort)
   
 end
 
--- ОТОБРАЖЕНИЕ ТАБЛИЦЫ
+-- РћРўРћР‘Р РђР–Р•РќРР• РўРђР‘Р›РР¦Р«
 
---показывает окно таблицы
+--РїРѕРєР°Р·С‹РІР°РµС‚ РѕРєРЅРѕ С‚Р°Р±Р»РёС†С‹
 function showTable()
 
   t:Show()
   
 end
 
---создает таблицу для отображения позиций и истории
+--СЃРѕР·РґР°РµС‚ С‚Р°Р±Р»РёС†Сѓ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РїРѕР·РёС†РёР№ Рё РёСЃС‚РѕСЂРёРё
 function createTable()
 
-  -- создать экземпляр QTable
+  -- СЃРѕР·РґР°С‚СЊ СЌРєР·РµРјРїР»СЏСЂ QTable
   t = QTable.new()
   if not t then
     message("error!", 3)
@@ -837,12 +837,12 @@ function createTable()
   t:AddColumn("secCode",    QTABLE_STRING_TYPE, 15)   --3
   t:AddColumn("classCode",  QTABLE_STRING_TYPE, 10)   --4
   
-  --Чем отличаются QTABLE_CACHED_STRING_TYPE и QTABLE_STRING_TYPE? Какой использовать тип для вывода строки?
-  --При использовании QTABLE_CACHED_STRING_TYPE в ячейке таблицы хранится ссылка на специальную таблицу уникальных 
-  --строковых констант, которая заполняется по мере добавления данных. Это экономит память при многократном 
-  --использовании повторяющихся значений. Например, если Вы хотите создать аналог таблицы всех сделок, то поле 
-  --"направление сделки" может принимать значение "Покупка" или "Продажа". В этом случае использование 
-  --QTABLE_CACHED_STRING_TYPE для столбца будет наиболее эффективным.   
+  --Р§РµРј РѕС‚Р»РёС‡Р°СЋС‚СЃСЏ QTABLE_CACHED_STRING_TYPE Рё QTABLE_STRING_TYPE? РљР°РєРѕР№ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РёРї РґР»СЏ РІС‹РІРѕРґР° СЃС‚СЂРѕРєРё?
+  --РџСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё QTABLE_CACHED_STRING_TYPE РІ СЏС‡РµР№РєРµ С‚Р°Р±Р»РёС†С‹ С…СЂР°РЅРёС‚СЃСЏ СЃСЃС‹Р»РєР° РЅР° СЃРїРµС†РёР°Р»СЊРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ СѓРЅРёРєР°Р»СЊРЅС‹С… 
+  --СЃС‚СЂРѕРєРѕРІС‹С… РєРѕРЅСЃС‚Р°РЅС‚, РєРѕС‚РѕСЂР°СЏ Р·Р°РїРѕР»РЅСЏРµС‚СЃСЏ РїРѕ РјРµСЂРµ РґРѕР±Р°РІР»РµРЅРёСЏ РґР°РЅРЅС‹С…. Р­С‚Рѕ СЌРєРѕРЅРѕРјРёС‚ РїР°РјСЏС‚СЊ РїСЂРё РјРЅРѕРіРѕРєСЂР°С‚РЅРѕРј 
+  --РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ Р·РЅР°С‡РµРЅРёР№. РќР°РїСЂРёРјРµСЂ, РµСЃР»Рё Р’С‹ С…РѕС‚РёС‚Рµ СЃРѕР·РґР°С‚СЊ Р°РЅР°Р»РѕРі С‚Р°Р±Р»РёС†С‹ РІСЃРµС… СЃРґРµР»РѕРє, С‚Рѕ РїРѕР»Рµ 
+  --"РЅР°РїСЂР°РІР»РµРЅРёРµ СЃРґРµР»РєРё" РјРѕР¶РµС‚ РїСЂРёРЅРёРјР°С‚СЊ Р·РЅР°С‡РµРЅРёРµ "РџРѕРєСѓРїРєР°" РёР»Рё "РџСЂРѕРґР°Р¶Р°". Р’ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ 
+  --QTABLE_CACHED_STRING_TYPE РґР»СЏ СЃС‚РѕР»Р±С†Р° Р±СѓРґРµС‚ РЅР°РёР±РѕР»РµРµ СЌС„С„РµРєС‚РёРІРЅС‹Рј.   
   t:AddColumn("operation",  QTABLE_CACHED_STRING_TYPE, 10)    --5   --buy/sell
   
   t:AddColumn("quantity",   QTABLE_INT_TYPE, 10)        --6
@@ -851,17 +851,17 @@ function createTable()
   
   t:AddColumn("dateClose",  QTABLE_STRING_TYPE, 10)     --9
   t:AddColumn("timeClose",  QTABLE_STRING_TYPE, 10)     --10
-  t:AddColumn("priceClose", QTABLE_DOUBLE_TYPE, 20)     --11  --здесь отображается текущая цена
+  t:AddColumn("priceClose", QTABLE_DOUBLE_TYPE, 20)     --11  --Р·РґРµСЃСЊ РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ С‚РµРєСѓС‰Р°СЏ С†РµРЅР°
   
   t:AddColumn("commission", QTABLE_DOUBLE_TYPE, 10)     --12
   
   t:AddColumn("accrual",    QTABLE_DOUBLE_TYPE, 10)     --13
   
   t:AddColumn("profit %",   QTABLE_DOUBLE_TYPE, 10)     --14
-  t:AddColumn("profit",     QTABLE_DOUBLE_TYPE, 10)     --15  --в рублях или валюте (пунктах)
-  t:AddColumn("profitpt",    QTABLE_DOUBLE_TYPE, 10)     --15  --в пунктах, например Ri
+  t:AddColumn("profit",     QTABLE_DOUBLE_TYPE, 10)     --15  --РІ СЂСѓР±Р»СЏС… РёР»Рё РІР°Р»СЋС‚Рµ (РїСѓРЅРєС‚Р°С…)
+  t:AddColumn("profitpt",    QTABLE_DOUBLE_TYPE, 10)     --15  --РІ РїСѓРЅРєС‚Р°С…, РЅР°РїСЂРёРјРµСЂ Ri
   
-  t:AddColumn("days",       QTABLE_INT_TYPE, 10)        --16  --дней в позиции
+  t:AddColumn("days",       QTABLE_INT_TYPE, 10)        --16  --РґРЅРµР№ РІ РїРѕР·РёС†РёРё
   
   t:AddColumn("comment",    QTABLE_STRING_TYPE, 20)     --17
 
@@ -871,7 +871,7 @@ end
 
 
 
--- обработчики событий ----
+-- РѕР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ ----
 
 function OnInit(s)
 
@@ -890,51 +890,51 @@ function OnStop(s)
 end
 
 function OnQuote(class_code, sec_code)
-	--выводим котировку и считаем PnL
+	--РІС‹РІРѕРґРёРј РєРѕС‚РёСЂРѕРІРєСѓ Рё СЃС‡РёС‚Р°РµРј PnL
 end
 
 function OnTransReply(repl)
 end
 
 function OnTrade(trade)
-	--добавить сделку в таблицу обработанных
-	--сначала проверить, что ее там нет
+	--РґРѕР±Р°РІРёС‚СЊ СЃРґРµР»РєСѓ РІ С‚Р°Р±Р»РёС†Сѓ РѕР±СЂР°Р±РѕС‚Р°РЅРЅС‹С…
+	--СЃРЅР°С‡Р°Р»Р° РїСЂРѕРІРµСЂРёС‚СЊ, С‡С‚Рѕ РµРµ С‚Р°Рј РЅРµС‚
 
 	if find_current_deal(trade.trade_num) == 0 then
 		
 		table.insert(currentDeals, trade.trade_num)
 		
-		--для теста - добавить позицию в таблицу t
+		--РґР»СЏ С‚РµСЃС‚Р° - РґРѕР±Р°РІРёС‚СЊ РїРѕР·РёС†РёСЋ РІ С‚Р°Р±Р»РёС†Сѓ t
 		--addRowTrade(trade)
 		
 	
     
-    --добавить позицию в sqlite
+    --РґРѕР±Р°РІРёС‚СЊ РїРѕР·РёС†РёСЋ РІ sqlite
     --insertTradeIntoPositions(trade)
 		
-		--добавить позицию в ФИФО
+		--РґРѕР±Р°РІРёС‚СЊ РїРѕР·РёС†РёСЋ РІ Р¤РР¤Рћ
 		makeFifo(trade)
 		
 	end
 
-  --перезаполнить таблицу закрытых позиций
+  --РїРµСЂРµР·Р°РїРѕР»РЅРёС‚СЊ С‚Р°Р±Р»РёС†Сѓ Р·Р°РєСЂС‹С‚С‹С… РїРѕР·РёС†РёР№
 
-  --сначала все удалить
+  --СЃРЅР°С‡Р°Р»Р° РІСЃРµ СѓРґР°Р»РёС‚СЊ
   
   --clearClosedPositions()
   
-  --потом добавить все открытые
+  --РїРѕС‚РѕРј РґРѕР±Р°РІРёС‚СЊ РІСЃРµ РѕС‚РєСЂС‹С‚С‹Рµ
   
   --loadClosedPositions()
   
 	
-	--перезаполнить таблицу открытых позиций
+	--РїРµСЂРµР·Р°РїРѕР»РЅРёС‚СЊ С‚Р°Р±Р»РёС†Сѓ РѕС‚РєСЂС‹С‚С‹С… РїРѕР·РёС†РёР№
 
-	--сначала все удалить
+	--СЃРЅР°С‡Р°Р»Р° РІСЃРµ СѓРґР°Р»РёС‚СЊ
 	
 	--clearOpenPositions()
 	
-	--потом добавить все открытые
+	--РїРѕС‚РѕРј РґРѕР±Р°РІРёС‚СЊ РІСЃРµ РѕС‚РєСЂС‹С‚С‹Рµ
 	
 	--loadOpenPositions()
 	
@@ -954,55 +954,55 @@ end
 -- +----------------------------------------------------+
 
 
--- функция обратного вызова для обработки событий в таблице. вызывается из main()
---(или, другими словами, обработчик клика по таблице робота)
---параметры:
---  t_id - хэндл таблицы, полученный функцией AllocTable()
---  msg - тип события, происшедшего в таблице
---  par1 и par2 – значения параметров определяются типом сообщения msg, 
+-- С„СѓРЅРєС†РёСЏ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№ РІ С‚Р°Р±Р»РёС†Рµ. РІС‹Р·С‹РІР°РµС‚СЃСЏ РёР· main()
+--(РёР»Рё, РґСЂСѓРіРёРјРё СЃР»РѕРІР°РјРё, РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»РёРєР° РїРѕ С‚Р°Р±Р»РёС†Рµ СЂРѕР±РѕС‚Р°)
+--РїР°СЂР°РјРµС‚СЂС‹:
+--  t_id - С…СЌРЅРґР» С‚Р°Р±Р»РёС†С‹, РїРѕР»СѓС‡РµРЅРЅС‹Р№ С„СѓРЅРєС†РёРµР№ AllocTable()
+--  msg - С‚РёРї СЃРѕР±С‹С‚РёСЏ, РїСЂРѕРёСЃС€РµРґС€РµРіРѕ РІ С‚Р°Р±Р»РёС†Рµ
+--  par1 Рё par2 вЂ“ Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РѕРїСЂРµРґРµР»СЏСЋС‚СЃСЏ С‚РёРїРѕРј СЃРѕРѕР±С‰РµРЅРёСЏ msg, 
 --
---функция должна располагаться перед main(), иначе - скрипт не останавливается при закрытии окна
+--С„СѓРЅРєС†РёСЏ РґРѕР»Р¶РЅР° СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РїРµСЂРµРґ main(), РёРЅР°С‡Рµ - СЃРєСЂРёРїС‚ РЅРµ РѕСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РїСЂРё Р·Р°РєСЂС‹С‚РёРё РѕРєРЅР°
 local f_cb = function( t_id,  msg,  par1, par2)
   
   if (msg==QTABLE_CLOSE)  then
     DestroyTable(t.t_id)
     is_run = false
-    --message("Стоп",1)
+    --message("РЎС‚РѕРї",1)
   end
 
 end 
 
--- основная функция робота. здесь обновляется котировка и рассчитывается прибыль
+-- РѕСЃРЅРѕРІРЅР°СЏ С„СѓРЅРєС†РёСЏ СЂРѕР±РѕС‚Р°. Р·РґРµСЃСЊ РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РєРѕС‚РёСЂРѕРІРєР° Рё СЂР°СЃСЃС‡РёС‚С‹РІР°РµС‚СЃСЏ РїСЂРёР±С‹Р»СЊ
 function main()
 
   while is_run do
   
     local rows = t:GetSize(t.t_id)
       
-    --номер строки, с которой начинаются открытые позиции.
-    --все, что меньше (выше), это - закрытые позиции. у них не надо обновлять котировку и пересчитывать прибыль.
+    --РЅРѕРјРµСЂ СЃС‚СЂРѕРєРё, СЃ РєРѕС‚РѕСЂРѕР№ РЅР°С‡РёРЅР°СЋС‚СЃСЏ РѕС‚РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё.
+    --РІСЃРµ, С‡С‚Рѕ РјРµРЅСЊС€Рµ (РІС‹С€Рµ), СЌС‚Рѕ - Р·Р°РєСЂС‹С‚С‹Рµ РїРѕР·РёС†РёРё. Сѓ РЅРёС… РЅРµ РЅР°РґРѕ РѕР±РЅРѕРІР»СЏС‚СЊ РєРѕС‚РёСЂРѕРІРєСѓ Рё РїРµСЂРµСЃС‡РёС‚С‹РІР°С‚СЊ РїСЂРёР±С‹Р»СЊ.
     local openPosStartRow = 99999999
     openPosStartRow = findFirstOpenPosRow()
     
-    --обход таблицы истории сделок
+    --РѕР±С…РѕРґ С‚Р°Р±Р»РёС†С‹ РёСЃС‚РѕСЂРёРё СЃРґРµР»РѕРє
     for row=1, rows, 1 do
 
-      --для строк, находящихся ниже, обновляем котировку
+      --РґР»СЏ СЃС‚СЂРѕРє, РЅР°С…РѕРґСЏС‰РёС…СЃСЏ РЅРёР¶Рµ, РѕР±РЅРѕРІР»СЏРµРј РєРѕС‚РёСЂРѕРІРєСѓ
       if row >= openPosStartRow then
         --message(row)
-        --получим цену последней сделки 
+        --РїРѕР»СѓС‡РёРј С†РµРЅСѓ РїРѕСЃР»РµРґРЅРµР№ СЃРґРµР»РєРё 
         local tparam = getParamEx (t:GetValue(row,'classCode').image, t:GetValue(row,'secCode').image, 'last')
         
-        --установим текущую цену в таблицу
+        --СѓСЃС‚Р°РЅРѕРІРёРј С‚РµРєСѓС‰СѓСЋ С†РµРЅСѓ РІ С‚Р°Р±Р»РёС†Сѓ
         
-        --метод класса не работает
+        --РјРµС‚РѕРґ РєР»Р°СЃСЃР° РЅРµ СЂР°Р±РѕС‚Р°РµС‚
         --t:SetValue(row, 'priceClose', tostring(tparam.param_value))
-        --поэтому используем этот (последний параметр функции не заполнять!)
-        --иначе - значение не обновляется:(
+        --РїРѕСЌС‚РѕРјСѓ РёСЃРїРѕР»СЊР·СѓРµРј СЌС‚РѕС‚ (РїРѕСЃР»РµРґРЅРёР№ РїР°СЂР°РјРµС‚СЂ С„СѓРЅРєС†РёРё РЅРµ Р·Р°РїРѕР»РЅСЏС‚СЊ!)
+        --РёРЅР°С‡Рµ - Р·РЅР°С‡РµРЅРёРµ РЅРµ РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ:(
         --message(tparam.param_value)
         
         t:SetValue(row, 'priceClose', tostring(tparam.param_value)) 
-        --рассчитаем прибыль       
+        --СЂР°СЃСЃС‡РёС‚Р°РµРј РїСЂРёР±С‹Р»СЊ       
         recalcPosition(row)
           
       end
